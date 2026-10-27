@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — Lifeline{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Admin Management Dashboard</h1>
+  <p class="subtitle">System overview, donor availability management, donation records, and emergency search logs.</p>
+</div>
+
+<div class="stats-grid" style="margin-bottom: 36px;">
+  <div class="stat-card">
+    <div class="stat-icon">🩸</div>
+    <div class="stat-value">{{ stats.total_donors }}</div>
+    <div class="stat-label">Total Donors</div>
+  </div>
+  <div class="stat-card stat-card-active">
+    <div class="stat-icon">✨</div>
+    <div class="stat-value">{{ stats.available_donors }}</div>
+    <div class="stat-label">Available Donors</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">🔎</div>
+    <div class="stat-value">{{ stats.total_searches }}</div>
+    <div class="stat-label">Total Searches</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">❤️</div>
+    <div class="stat-value">{{ stats.total_donations }}</div>
+    <div class="stat-label">Donations Recorded</div>
+  </div>
+</div>
+
+<h2 style="font-size: 1.35rem; margin-bottom: 14px;">All Registered Donors ({{ donors|length }})</h2>
+<div class="table-responsive">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th><th>Name</th><th>Group</th><th>Phone</th><th>Locality</th><th>City</th>
+        <th>Last Donation</th><th>Status</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in donors %}
+      <tr>
+        <td>#{{ d.donor_id }}</td>
+        <td><strong>{{ d.name }}</strong></td>
+        <td><span class="pill-group" style="background: #fee2e2; padding: 2px 8px; border-radius: 4px;">{{ d.blood_group }}</span></td>
+        <td><a href="tel:{{ d.phone }}" style="color: var(--primary); text-decoration: none; font-weight: 700;">{{ d.phone }}</a></td>
+        <td>{{ d.locality }}</td>
+        <td>{{ d.city }}</td>
+        <td>{{ d.last_donation_date or "Never" }}</td>
+        <td>
+          {% if d.availability %}
+            <span class="badge badge-exact">Available</span>
+          {% else %}
+            <span class="badge badge-compat">Unavailable</span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="admin-actions">
+            <form method="POST" action="{{ url_for('toggle_donor_availability', donor_id=d.donor_id) }}">
+              <button type="submit" class="btn-small">Toggle</button>
+            </form>
+            <form method="POST" action="{{ url_for('mark_donated', donor_id=d.donor_id) }}">
+              <button type="submit" class="btn-small btn-confirm">Mark Donated</button>
+            </form>
+            <form method="POST" action="{{ url_for('delete_donor', donor_id=d.donor_id) }}" onsubmit="return confirm('Remove {{ d.name }} from the directory?');">
+              <button type="submit" class="btn-small btn-danger">Delete</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2 style="font-size: 1.35rem; margin: 32px 0 14px;">Recent Emergency Searches</h2>
+<div class="table-responsive">
+  <table class="data-table">
+    <thead>
+      <tr><th>Blood Group</th><th>City</th><th>Locality</th><th>Results Found</th><th>When</th></tr>
+    </thead>
+    <tbody>
+      {% for s in recent_searches %}
+      <tr>
+        <td><span class="pill-group" style="background: #fee2e2; padding: 2px 8px; border-radius: 4px;">{{ s.blood_group }}</span></td>
+        <td>{{ s.city }}</td>
+        <td>{{ s.locality or "-" }}</td>
+        <td><strong>{{ s.results_found }}</strong></td>
+        <td>{{ s.searched_on }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2 style="font-size: 1.35rem; margin: 32px 0 14px;">Donation History</h2>
+<div class="table-responsive">
+  <table class="data-table">
+    <thead>
+      <tr><th>ID</th><th>Donor</th><th>Blood Group</th><th>Date</th></tr>
+    </thead>
+    <tbody>
+      {% for h in history %}
+      <tr>
+        <td>#{{ h.donation_id }}</td>
+        <td><strong>{{ h.donor_name }}</strong></td>
+        <td><span class="pill-group" style="background: #fee2e2; padding: 2px 8px; border-radius: 4px;">{{ h.blood_group }}</span></td>
+        <td>{{ h.donation_date }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+

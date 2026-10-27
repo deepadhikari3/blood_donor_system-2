@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Admin Login{% endblock %}
+{% block content %}
+<h1>Admin Login</h1>
+<p class="subtitle">Restricted area. Sign in to manage donors and view analytics.</p>
+
+<form method="POST" class="form-card" style="max-width:360px;">
+  <input type="hidden" name="next" value="{{ next }}">
+  <div class="form-row">
+    <label>Username</label>
+    <input type="text" name="username" required autofocus>
+  </div>
+  <div class="form-row">
+    <label>Password</label>
+    <input type="password" name="password" required>
+  </div>
+  <button type="submit" class="btn-primary">Log In</button>
+</form>
+{% endblock %}

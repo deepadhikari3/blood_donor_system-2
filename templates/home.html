@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Lifeline — Find Blood Donors Instantly{% endblock %}
+{% block content %}
+<div class="hero-section">
+  <div class="hero-badge">⚡ Instant Direct Contact &bull; Zero Waiting Time</div>
+  <h1 class="hero-title">Need Blood Urgently?<br><span class="highlight-text">Find Donors Near You.</span></h1>
+  <p class="hero-subtitle">Connecting patients and hospitals directly with verified blood donors across <strong>Palghar, Boisar, Tarapur &amp; Vasai-Virar</strong> region. Instant phone numbers, no approval queues.</p>
+</div>
+
+<!-- Quick Search Container -->
+<div class="search-card-wrapper">
+  <form method="GET" action="{{ url_for('search') }}" class="glass-card search-card">
+    <div class="card-header-tag">🔍 Emergency Blood Finder</div>
+    
+    <!-- Quick Blood Group Selector Chips -->
+    <div class="blood-chip-selector">
+      <label class="field-label">Select Required Blood Group:</label>
+      <div class="chip-grid">
+        {% for bg in blood_groups %}
+          <label class="chip-item">
+            <input type="radio" name="blood_group" value="{{ bg }}" required class="chip-radio" onclick="document.getElementById('home-bg-select').value='{{ bg }}';">
+            <span class="chip-badge">{{ bg }}</span>
+          </label>
+        {% endfor %}
+      </div>
+      <input type="hidden" id="home-bg-select" name="blood_group" value="">
+    </div>
+
+    <div class="search-fields-row">
+      <div class="field-group">
+        <label class="field-label">City / Region *</label>
+        <div class="select-wrapper">
+          <select name="city" required class="custom-input">
+            <option value="" disabled selected>Select City</option>
+            {% for c in cities %}
+              <option value="{{ c }}">{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Locality / Area (Optional)</label>
+        <input type="text" name="locality" placeholder="e.g. Boisar West, Tarapur MIDC" class="custom-input">
+      </div>
+    </div>
+
+    <button type="submit" class="btn-hero-action">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      Search Available Donors Now
+    </button>
+  </form>
+</div>
+
+<!-- Live System Stats Grid -->
+<div class="stats-section">
+  <div class="section-heading">
+    <h2>Real-Time Directory Impact</h2>
+    <span class="live-indicator"><span class="dot"></span> Live Data</span>
+  </div>
+  
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">🩸</div>
+      <div class="stat-value">{{ stats.total_donors }}</div>
+      <div class="stat-label">Registered Donors</div>
+    </div>
+    <div class="stat-card stat-card-active">
+      <div class="stat-icon">✨</div>
+      <div class="stat-value">{{ stats.available_donors }}</div>
+      <div class="stat-label">Ready to Donate</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🔎</div>
+      <div class="stat-value">{{ stats.total_searches }}</div>
+      <div class="stat-label">Emergency Searches</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">❤️</div>
+      <div class="stat-value">{{ stats.total_donations }}</div>
+      <div class="stat-label">Donations Completed</div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Action Cards Grid -->
+<div class="cta-grid">
+  <a class="cta-card cta-card-donate" href="{{ url_for('register_donor') }}">
+    <div class="cta-icon-wrapper">➕</div>
+    <div class="cta-content">
+      <h3>Register as a Donor</h3>
+      <p>Save lives in your community. Takes 1 minute to register your contact info.</p>
+    </div>
+    <span class="cta-arrow">&rarr;</span>
+  </a>
+  <a class="cta-card cta-card-search" href="{{ url_for('search') }}">
+    <div class="cta-icon-wrapper">📞</div>
+    <div class="cta-content">
+      <h3>Find &amp; Call Donors</h3>
+      <p>Instant access to phone numbers, distance ranking, and availability status.</p>
+    </div>
+    <span class="cta-arrow">&rarr;</span>
+  </a>
+</div>
+
+<!-- Blood Group Summary Badges -->
+<div class="group-breakdown-card glass-card">
+  <h3>Donors Breakdown by Blood Group</h3>
+  <div class="bg-pills-flex">
+    {% for bg, count in stats.donors_by_group.items() %}
+      <a href="{{ url_for('search', blood_group=bg, city='Boisar') }}" class="bg-stat-pill">
+        <span class="pill-group">{{ bg }}</span>
+        <span class="pill-count">{{ count }} active</span>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
